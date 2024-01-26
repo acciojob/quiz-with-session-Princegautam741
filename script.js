@@ -11,31 +11,29 @@ function renderQuestions() {
     for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         const questionElement = document.createElement('div');
-        questionElement.innerHTML = `
-            <p>${question.question}</p>
-            <ul>
-                ${question.choices.map(choice => `<li><input type="radio" name="question${i}" value="${choice}">${choice}</li>`).join('')}
-            </ul>
-        `;
-        document.getElementById('questions').appendChild(questionElement);
+        const questionText = document.createTextNode(question.question);
+        questionElement.appendChild(questionText);
 
-        // Load saved progress from session storage if available
-        const savedProgress = sessionStorage.getItem('progress');
-        if (savedProgress) {
-            const choices = JSON.parse(savedProgress);
-            const radioInputs = document.querySelectorAll(`input[name="question${i}"]`);
-            radioInputs.forEach(input => {
-                if (choices[i] === input.value) {
-                    input.checked = true;
-                }
-            });
+        for (let j = 0; j < question.choices.length; j++) {
+            const choice = question.choices[j];
+
+            const choiceElement = document.createElement('input');
+            choiceElement.setAttribute('type', 'radio');
+            choiceElement.setAttribute('name', `question-${i}`);
+            choiceElement.setAttribute('value', choice);
+
+            // Uncomment the following lines if you want to check the saved progress
+            // const savedProgress = sessionStorage.getItem('progress');
+            // if (savedProgress && JSON.parse(savedProgress)[i] === choice) {
+            //     choiceElement.checked = true;
+            // }
+
+            const choiceText = document.createTextNode(choice);
+            questionElement.appendChild(choiceElement);
+            questionElement.appendChild(choiceText);
         }
 
-        // Add event listener to save progress on radio button selection
-        questionElement.addEventListener('change', function () {
-            const selectedOptions = Array.from(document.querySelectorAll(`input[name="question${i}"]:checked`)).map(input => input.value);
-            sessionStorage.setItem('progress', JSON.stringify(selectedOptions));
-        });
+        document.getElementById('questions').appendChild(questionElement);
     }
 
     // Display the submit button and calculate the score on click
